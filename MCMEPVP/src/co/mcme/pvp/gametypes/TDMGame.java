@@ -1,5 +1,6 @@
-package co.mcme.pvp;
+package co.mcme.pvp.gametypes;
 
+import co.mcme.pvp.GameType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -7,11 +8,13 @@ import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class Game {
+import co.mcme.pvp.Game;
+
+public class TDMGame extends Game{
     public GameType GameType;
 
-    protected Game(GameType gt) {
-        GameType = gt;
+    public TDMGame(GameType gt) {
+        super(gt);
         //TODO: Code on Game Start
     }
 

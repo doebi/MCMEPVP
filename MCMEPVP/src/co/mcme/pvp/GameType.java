@@ -1,9 +1,5 @@
 package co.mcme.pvp;
 
-/**
- * 
- * @author Henry Slawniak
- */
 public enum GameType {
 
     /**
