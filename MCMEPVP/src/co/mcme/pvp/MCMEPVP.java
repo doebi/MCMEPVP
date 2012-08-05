@@ -17,9 +17,7 @@ public class MCMEPVP extends JavaPlugin {
     public static HashMap<String, String> PlayerStatus;
     public static int GameStatus;
     public static GameType[] GameTypes = GameType.values();
-    public static String[] Gamers;
 
-    //onEnable, run when server starts
     @Override
     public void onEnable() {
         //registering Listener
@@ -40,32 +38,44 @@ public class MCMEPVP extends JavaPlugin {
                         //Check if player is participating already
                         if (PlayerStatus.get(player.getName()) != null) {
                             player.sendMessage(ChatColor.DARK_RED
-                                    + "You are already participating in the PVP Event!");
+                                    + "You are already participating in the next Game!");
+                            return true;
                         } else {
-                            CurrentGame.onPlayerjoinGame(player);
+                        	//queuePlayer
+                        	player.setPlayerListName(ChatColor.GREEN  + player.getName());
+                        	MCMEPVP.PlayerStatus.put(player.getName(), "participant");
+                        	player.sendMessage(ChatColor.YELLOW + "You are participating! Wait for the next Game to start!");
+                            return true;
                         }
-                        return true;
                     } else {
                         player.sendMessage(ChatColor.DARK_RED
-                                + "You can't join a running Event!");
+                                + "You can't join a running Game!");
                         return true;
                     }
                 }
                 //START
                 if (method.equalsIgnoreCase("start")) {
                     if (player.hasPermission("mcmepvp.admin")) {
-                        if (Gamers.length >= 2) {
-                        	if(args[1] == "TDM"){
-                                CurrentGame = new TDMGame(null);
-                        	}else{
-                                CurrentGame = new Game(null);
-                        	}
-                            return true;
-                        } else {
+                    	if(GameStatus == 0){
+	                    	int check = 0;
+	                    	for (Player cplayer : getServer().getOnlinePlayers()) {
+	                    		if(PlayerStatus.get(cplayer.toString()) == "spectator"){
+	                    			check++;
+	                    		}
+	                    	}
+	                        if (check >= 2) {
+	                        	startGame(args[1]);
+	                            return true;
+	                        } else {
+	                            player.sendMessage(ChatColor.DARK_RED
+	                                    + "There need to be at least two participants!");
+	                            return true;
+	                        }
+                    	} else {
                             player.sendMessage(ChatColor.DARK_RED
-                                    + "There need to be at least two participants!");
+                                    + "Game already running!");
                             return true;
-                        }
+                    	}
                     } else {
                         player.sendMessage(ChatColor.DARK_RED
                                 + "You're not an Admin!");
@@ -103,8 +113,15 @@ public class MCMEPVP extends JavaPlugin {
         return false;
     }
 
-    static void resetGame() {
+	static void resetGame() {
     	//TODO
     }
-
+    
+    void startGame(String gt){
+    	if(gt == "TDM"){
+            CurrentGame = new TDMGame(null);
+    	}else{
+    		
+    	}
+    }
 }

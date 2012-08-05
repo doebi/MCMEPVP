@@ -1,5 +1,5 @@
 name: MCMEPVP
-main: at.doebi.MCMEPVP
+main: co.mcme.pvp.MCMEPVP
 version: 1.0.0
 commands:
    pvp:

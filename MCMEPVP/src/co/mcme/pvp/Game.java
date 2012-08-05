@@ -3,7 +3,7 @@ package co.mcme.pvp;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -25,7 +25,7 @@ public class Game {
 		
 	}
 
-	public void onPlayerchat(PlayerChatEvent event) {
+	public void onPlayerchat(AsyncPlayerChatEvent event) {
 		// TODO Auto-generated method stub
 		
 	}
