@@ -12,7 +12,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -80,32 +79,16 @@ public class TDMGame extends Game{
     }
 
 	protected void addTeam(Player player, String Team) {
-		//clear Inventory
-		player.getInventory().clear();
-		if(Team == "spectator"){
-			//TODO player.setFlying(true);
-			MCMEPVP.PlayerStatus.put(player.getName(), "spectator");
-			player.setPlayerListName(ChatColor.WHITE + player.getName());
-			player.setDisplayName(ChatColor.WHITE + player.getName());
-			player.getInventory().setArmorContents(null);
+		player.sendMessage(ChatColor.YELLOW + "You're now in Team " + Team.toUpperCase() + "!");
+		if(Team == "red"){
+			RedMates++;
+			MCMEPVP.setPlayerStatus(player, Team, ChatColor.RED);
+			player.getInventory().setHelmet(new ItemStack(35, 1, (short) 0, (byte) 14));
 		}else{
-			//TODO gives error :( 
-			//player.setFlying(false);
-			player.sendMessage(ChatColor.YELLOW + "You're now in Team " + Team.toUpperCase() + "!");
-			if(Team == "red"){
-				RedMates++;
-				MCMEPVP.PlayerStatus.put(player.getName(), "red");
-				player.setPlayerListName(ChatColor.RED + player.getName());
-				player.setDisplayName(ChatColor.RED + player.getName());
-				player.getInventory().setHelmet(new ItemStack(35, 1, (short) 0, (byte) 14));
-			}else{
-				if(Team == "blue"){
-					BlueMates++;
-					MCMEPVP.PlayerStatus.put(player.getName(), "blue");
-					player.setPlayerListName(ChatColor.BLUE + player.getName());
-					player.setDisplayName(ChatColor.BLUE + player.getName());
-					player.getInventory().setHelmet(new ItemStack(35, 1, (short) 0, (byte) 11));
-				}
+			if(Team == "blue"){
+				BlueMates++;
+				MCMEPVP.setPlayerStatus(player, Team, ChatColor.BLUE);
+				player.getInventory().setHelmet(new ItemStack(35, 1, (short) 0, (byte) 11));
 			}
 		}
 	}
@@ -116,13 +99,16 @@ public class TDMGame extends Game{
 	}
 
 	public void onPlayerleaveServer(PlayerQuitEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onPlayerchat(AsyncPlayerChatEvent event) {
-		// TODO Auto-generated method stub
-		
+		String OldTeam = MCMEPVP.getPlayerStatus(event.getPlayer());
+		if(OldTeam == "red"){
+			RedMates--;
+		} else {
+			if(OldTeam == "blue"){
+				BlueMates--;
+			} else {
+				//Error
+			}
+		}
 	}
 
 	public void onPlayerdie(PlayerDeathEvent event) {

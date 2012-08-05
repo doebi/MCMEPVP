@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ public class MCMEPVP extends JavaPlugin {
     public static HashMap<String, String> PlayerStatus;
     public static int GameStatus;
     public static GameType[] GameTypes = GameType.values();
+    public static World PVPWorld;
 
     @Override
     public void onEnable() {
@@ -36,14 +38,13 @@ public class MCMEPVP extends JavaPlugin {
                 if (method.equalsIgnoreCase("join")) {
                     if (GameStatus == 0) {
                         //Check if player is participating already
-                        if (PlayerStatus.get(player.getName()) != null) {
+                        if (PlayerStatus.get(player.getName()) != "spectator") {
                             player.sendMessage(ChatColor.DARK_RED
                                     + "You are already participating in the next Game!");
                             return true;
                         } else {
                         	//queuePlayer
-                        	player.setPlayerListName(ChatColor.GREEN  + player.getName());
-                        	MCMEPVP.PlayerStatus.put(player.getName(), "participant");
+                        	setPlayerStatus(player, "participant", ChatColor.GREEN);
                         	player.sendMessage(ChatColor.YELLOW + "You are participating! Wait for the next Game to start!");
                             return true;
                         }
@@ -65,6 +66,7 @@ public class MCMEPVP extends JavaPlugin {
 	                    	}
 	                        if (check >= 2) {
 	                        	startGame(args[1]);
+	                        	MCMEPVP.PVPWorld = player.getWorld();
 	                            return true;
 	                        } else {
 	                            player.sendMessage(ChatColor.DARK_RED
@@ -114,14 +116,28 @@ public class MCMEPVP extends JavaPlugin {
     }
 
 	static void resetGame() {
+		PlayerStatus = new HashMap<String, String>();
     	//TODO
     }
     
     void startGame(String gt){
     	if(gt == "TDM"){
-            CurrentGame = new TDMGame(null);
+            CurrentGame = new TDMGame(GameType.TDM);
     	}else{
     		
     	}
     }
+
+	public static void setPlayerStatus(Player player, String status, ChatColor NameColor) {
+		player.getInventory().clear();
+		player.getInventory().setArmorContents(null);
+		PlayerStatus.put(player.getName(), status);
+		player.setPlayerListName(NameColor + player.getName());
+		player.setDisplayName(NameColor + player.getName());
+	}
+
+	public static String getPlayerStatus(Player player) {
+		String status = PlayerStatus.get(player.getName());
+		return status;
+	}
 }
