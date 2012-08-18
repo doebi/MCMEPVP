@@ -26,9 +26,6 @@ public class MCMEPVP extends JavaPlugin {
     public void onEnable() {
         //registering Listener
         getServer().getPluginManager().registerEvents(new MCMEPVPListener(this), this);
-        Spawns.put("blue", (Vector) this.getConfig().get("spawns.spectator"));
-        Spawns.put("red", (Vector) this.getConfig().get("spawns.red"));
-        Spawns.put("spectator", (Vector) this.getConfig().get("spawns.spectator"));
         resetGame();
     }
 
@@ -123,10 +120,15 @@ public class MCMEPVP extends JavaPlugin {
 	public static void resetGame() {
             PlayerStatus = new HashMap<String, String>();
             Spawns = new HashMap<String, Vector>();
-            //TODO
-    }
+            for (Player currentplayer : Bukkit.getOnlinePlayers()) {
+        	setPlayerStatus(currentplayer, "spectator", ChatColor.WHITE);
+            }
+        }
     
         void startGame(String gt){
+            Spawns.put("blue", (Vector) this.getConfig().get("spawns.spectator"));
+            Spawns.put("red", (Vector) this.getConfig().get("spawns.red"));
+            Spawns.put("spectator", (Vector) this.getConfig().get("spawns.spectator"));
             if(gt == "TDM"){
                 CurrentGame = new TDMGame(GameType.TDM);
             }else{

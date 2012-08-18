@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -86,7 +87,7 @@ public class MCMEPVPListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    void onPlayerDamage(final EntityDamageByEntityEvent event) {
+    void onPlayerDamageByEntity(final EntityDamageByEntityEvent event) {
         if(event.getEntity().getType().equals(EntityType.PLAYER)){
             Player Victim = (Player) event.getEntity();
             if(MCMEPVP.getPlayerStatus(Victim).equals("spectator")){
@@ -98,6 +99,16 @@ public class MCMEPVPListener implements Listener {
                 }else{
                     MCMEPVP.CurrentGame.onPlayerhit(event);
                 }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    void onPlayerDamage(final EntityDamageEvent event) {
+        if(event.getEntity().getType().equals(EntityType.PLAYER)){
+            Player Victim = (Player) event.getEntity();
+            if(MCMEPVP.getPlayerStatus(Victim).equals("spectator")){
+                event.setCancelled(true);
             }
         }
     }
