@@ -18,15 +18,23 @@ public class MCMEPVP extends JavaPlugin {
     public static Game CurrentGame;
     public static HashMap<String, String> PlayerStatus;
     public static int GameStatus;
-    public static GameType[] GameTypes = GameType.values();
+    public static int Participants;
     public static World PVPWorld;
+    public static String PVPMap;
+    public static String GT;
     public static HashMap<String, Vector> Spawns;
 
     @Override
     public void onEnable() {
         //registering Listener
         getServer().getPluginManager().registerEvents(new MCMEPVPListener(this), this);
+        PVPMap = (String) this.getConfig().get("general.defaultMap");
+        GT = (String) this.getConfig().get("general.defaultGameType");
+        PVPWorld = Bukkit.getWorld((String) this.getConfig().get("general.defaultWorld"));
         resetGame();
+        Spawns.put("blue", (Vector) this.getConfig().get("spawns.spectator"));
+        Spawns.put("red", (Vector) this.getConfig().get("spawns.red"));
+        Spawns.put("spectator", (Vector) this.getConfig().get("spawns.spectator"));
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -46,6 +54,7 @@ public class MCMEPVP extends JavaPlugin {
                             return true;
                         } else {
                         	//queuePlayer
+                                Participants++;
                         	setPlayerStatus(player, "participant", ChatColor.GREEN);
                         	player.sendMessage(ChatColor.YELLOW + "You are participating! Wait for the next Game to start!");
                             return true;
@@ -60,15 +69,8 @@ public class MCMEPVP extends JavaPlugin {
                 if (method.equalsIgnoreCase("start")) {
                     if (player.hasPermission("mcmepvp.admin")) {
                     	if(GameStatus == 0){
-	                    	int check = 0;
-	                    	for (Player cplayer : getServer().getOnlinePlayers()) {
-	                    		if(PlayerStatus.get(cplayer.toString()) == "spectator"){
-	                    			check++;
-	                    		}
-	                    	}
-	                        if (check >= 2) {
-	                        	startGame(args[1]);
-	                        	MCMEPVP.PVPWorld = player.getWorld();
+	                        if (Participants >= 2) {
+                                    startGame();
 	                            return true;
 	                        } else {
 	                            player.sendMessage(ChatColor.DARK_RED
@@ -90,7 +92,28 @@ public class MCMEPVP extends JavaPlugin {
                 if (method.equalsIgnoreCase("set")) {
                     if (player.hasPermission("mcmepvp.admin")) {
                         if (args.length > 1) {
-                        	CurrentGame.onAdminset(args);
+                            Vector loc = player.getLocation().toVector();
+                            if(args[1].equalsIgnoreCase("blue")){
+				Spawns.put("blue", loc);
+				this.getConfig().set("spawns.blue", loc);
+				this.saveConfig();
+				player.sendMessage(ChatColor.YELLOW + "Saved your Location as Team Blue's Spawn!");
+				return true;
+                            }
+                            if(args[1].equalsIgnoreCase("red")){
+                            	Spawns.put("red", loc);
+                                this.getConfig().set("spawns.red", loc);
+			        this.saveConfig();
+				player.sendMessage(ChatColor.YELLOW + "Saved your Location as Team Red's Spawn!");
+				return true;
+                            }
+                            if(args[1].equalsIgnoreCase("spectator")){
+                                Spawns.put("spectator", loc);
+				this.getConfig().set("spawns.spectator", loc);
+				this.saveConfig();
+				player.sendMessage(ChatColor.YELLOW + "Saved your Location as Spectator's Spawn!");
+				return true;
+                            }
                         } else {
                             player.sendMessage("/pvp set [blue|red|spectator|class]");
                             return true;
@@ -118,6 +141,8 @@ public class MCMEPVP extends JavaPlugin {
     }
 
 	public static void resetGame() {
+            Participants = 0;
+            GameStatus = 0;
             PlayerStatus = new HashMap<String, String>();
             Spawns = new HashMap<String, Vector>();
             for (Player currentplayer : Bukkit.getOnlinePlayers()) {
@@ -125,15 +150,11 @@ public class MCMEPVP extends JavaPlugin {
             }
         }
     
-        void startGame(String gt){
+        void startGame(){
             Spawns.put("blue", (Vector) this.getConfig().get("spawns.spectator"));
             Spawns.put("red", (Vector) this.getConfig().get("spawns.red"));
             Spawns.put("spectator", (Vector) this.getConfig().get("spawns.spectator"));
-            if(gt == "TDM"){
-                CurrentGame = new TDMGame(GameType.TDM);
-            }else{
-
-            }
+            CurrentGame = new TDMGame();
         }
 
 	public static void setPlayerStatus(Player player, String status, ChatColor NameColor) {

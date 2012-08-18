@@ -2,7 +2,6 @@ package co.mcme.pvp.gametypes;
 
 import java.util.HashMap;
 
-import co.mcme.pvp.GameType;
 import co.mcme.pvp.MCMEPVP;
 
 import org.bukkit.Bukkit;
@@ -22,60 +21,54 @@ import org.bukkit.util.Vector;
 import co.mcme.pvp.Game;
 
 public class TDMGame extends Game{
-    public GameType GameType;
 	private int RedMates = 0;
 	private int BlueMates = 0;
-	private HashMap<String, Vector> Spawns;
+        public Plugin plugin;
 
-    public TDMGame(GameType gt) {
-        super(gt);
-		MCMEPVP.GameStatus = 1;
+    public TDMGame() {
+        MCMEPVP.GameStatus = 1;
         //Broadcast
-		Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "The next Game starts in a few seconds! GameType is TDM!");
-		Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "All Participants will be assigned to a team and teleported to their spawn!");
-	    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask((Plugin) this, new Runnable() {
-			public void run() {
-				for (Player user : Bukkit.getOnlinePlayers()) {
-		    		//TODO team assigning more random
-				    //Assign Teams
-				   	if(MCMEPVP.PlayerStatus.get(user.getName()) == "participant"){
-				   		if(BlueMates > RedMates){
-							addTeam(user,"red");
-						}else{
-							if(BlueMates < RedMates){
-								addTeam(user,"blue");
-							}
-							else{
-								boolean random = (Math.random() < 0.5);
-								if(random == true){
-									addTeam(user,"red");
-								}
-								else{
-									addTeam(user,"blue");
-								}
-							}
-						}
-				        //heal
-				        user.setHealth(20);
-				        user.setFoodLevel(20);
-				       	//Give Weapons and Armour
-				        PlayerInventory inv = user.getInventory();
-				        inv.setItemInHand(new ItemStack(276));//Sword
-				        inv.setChestplate(new ItemStack(311));//Armour
-				        inv.setLeggings(new ItemStack(312));//Leggins
-				        inv.setBoots(new ItemStack(313));//Boots
-				        inv.addItem(new ItemStack(261),new ItemStack(262, 32));//Bow + Arrows
-				   	}
-				    //Teleport User
-				    Vector vec = Spawns.get(MCMEPVP.PlayerStatus.get(user.getName()));
-				    World world = Bukkit.getWorld("pvp");
-				    Location loc = new Location(world, vec.getX(), vec.getY(), vec.getZ());
-			        user.teleport(loc);
-				}
-		        //Broadcast
-		        Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "The Fight begins!");
-			}
-		}, 100L);
+	Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "The next Game starts in a few seconds! GameType is TDM!");
+	Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "All Participants will be assigned to a team and teleported to their spawn!");
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("MCMEPVP"), new Runnable() {
+        public void run() {
+            for (Player user : Bukkit.getOnlinePlayers()) {
+                //TODO team assigning more random
+                //Assign Teams
+                if(MCMEPVP.PlayerStatus.get(user.getName()) == "participant"){
+                    if(BlueMates > RedMates){
+                        addTeam(user,"red");
+                    }else{
+                        if(BlueMates < RedMates){
+                            addTeam(user,"blue");
+                        }else{
+                            boolean random = (Math.random() < 0.5);
+                            if(random == true){
+                                addTeam(user,"red");
+                            }else{
+                                addTeam(user,"blue");
+                            }
+                        }
+                    }
+                    //heal
+                    user.setHealth(20);
+                    user.setFoodLevel(20);
+                    //Give Weapons and Armour
+                    PlayerInventory inv = user.getInventory();
+                    inv.setItemInHand(new ItemStack(276));//Sword
+                    inv.setChestplate(new ItemStack(311));//Armour
+                    inv.setLeggings(new ItemStack(312));//Leggins
+                    inv.setBoots(new ItemStack(313));//Boots
+                    inv.addItem(new ItemStack(261),new ItemStack(262, 32));//Bow + Arrows
+                }
+                //Teleport User
+                Vector vec = MCMEPVP.Spawns.get(MCMEPVP.PlayerStatus.get(user.getName()));
+                Location loc = new Location(MCMEPVP.PVPWorld, vec.getX(), vec.getY(), vec.getZ());
+                user.teleport(loc);
+            }
+            //Broadcast
+            Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "The Fight begins!");
+        }}, 100L);
     }
 
 	protected void addTeam(Player player, String Team) {
@@ -133,14 +126,9 @@ public class TDMGame extends Game{
 	}
 
 	public void onPlayerhit(EntityDamageByEntityEvent event) {
-		// TODO Auto-generated method stub
+            // TODO Auto-generated method stub
 		
-	}
-
-	public void onAdminset(String[] args) {
-		// TODO Auto-generated method stub
-		
-	}    
+	} 
 
     private void checkGameEnd() {
             if(BlueMates == 0){

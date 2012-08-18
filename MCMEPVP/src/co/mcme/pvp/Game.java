@@ -9,8 +9,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class Game {
     public GameType GameType;
 
-    protected Game(GameType gt) {
-        GameType = gt;
+    protected Game() {
         //TODO: Code on Game Start
     }
 
