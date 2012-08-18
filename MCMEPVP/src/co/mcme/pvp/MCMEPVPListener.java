@@ -2,6 +2,7 @@ package co.mcme.pvp;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -16,6 +17,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.Vector;
 
 public class MCMEPVPListener implements Listener {
 
@@ -26,7 +28,9 @@ public class MCMEPVPListener implements Listener {
     void onPlayerJoin(final PlayerLoginEvent event) {
 		MCMEPVP.setPlayerStatus(event.getPlayer(), "spectator", ChatColor.WHITE);
     	if(MCMEPVP.GameStatus == 0){
-    		//TODO General code when no Game is running
+	        Vector vec = MCMEPVP.Spawns.get("spectator");
+	        Location loc = new Location(MCMEPVP.PVPWorld, vec.getX(), vec.getY(), vec.getZ());
+        	event.getPlayer().teleport(loc);
     	}else{
     		MCMEPVP.CurrentGame.onPlayerjoinServer(event);
     	}
@@ -73,6 +77,7 @@ public class MCMEPVPListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     void onPlayerDeath(final PlayerDeathEvent event) {
+        event.getDrops().clear();
     	if(MCMEPVP.GameStatus == 0){
     		//TODO General code when no Game is running
     	}else{
@@ -82,13 +87,19 @@ public class MCMEPVPListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     void onPlayerDamage(final EntityDamageByEntityEvent event) {
-    	if(event.getDamager().getType().equals(EntityType.PLAYER) && event.getEntity().getType().equals(EntityType.PLAYER)){
-        	if(MCMEPVP.GameStatus == 0){
-        		//TODO General code when no Game is running
-        	}else{
-        		MCMEPVP.CurrentGame.onPlayerhit(event);
-        	}
-    	}
+        if(event.getEntity().getType().equals(EntityType.PLAYER)){
+            Player Victim = (Player) event.getEntity();
+            if(MCMEPVP.getPlayerStatus(Victim).equals("spectator")){
+                event.setCancelled(true);
+            }
+            if(event.getDamager().getType().equals(EntityType.PLAYER)){
+                if(MCMEPVP.GameStatus == 0){
+                    event.setCancelled(true);
+                }else{
+                    MCMEPVP.CurrentGame.onPlayerhit(event);
+                }
+            }
+        }
     }
     
     //TODO prevent player from taking off head

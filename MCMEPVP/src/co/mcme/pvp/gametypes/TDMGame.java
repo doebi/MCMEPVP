@@ -109,11 +109,27 @@ public class TDMGame extends Game{
 				//Error
 			}
 		}
+                checkGameEnd();
 	}
 
 	public void onPlayerdie(PlayerDeathEvent event) {
-		// TODO Auto-generated method stub
-		
+            Player player = event.getEntity();
+            String Status = MCMEPVP.getPlayerStatus(player);
+            if(Status == "spectator"){
+                event.setDeathMessage(ChatColor.YELLOW + "Spectator " + player.getName() + " was tired watching this fight!");
+            }
+            if(Status == "red"){
+                RedMates--;
+		event.setDeathMessage(ChatColor.RED + "Team Red " + ChatColor.YELLOW + "lost " + player.getName());
+		event.getDrops().add(new ItemStack(364, 1));
+            }
+            if(Status =="blue"){
+                BlueMates--;
+		event.setDeathMessage(ChatColor.BLUE + "Team Blue " + ChatColor.YELLOW + "lost " + player.getName());
+		event.getDrops().add(new ItemStack(364, 1));
+            }
+            MCMEPVP.setPlayerStatus(event.getEntity(),"spectator", ChatColor.WHITE);
+            checkGameEnd();		
 	}
 
 	public void onPlayerhit(EntityDamageByEntityEvent event) {
@@ -125,5 +141,15 @@ public class TDMGame extends Game{
 		// TODO Auto-generated method stub
 		
 	}    
+
+    private void checkGameEnd() {
+            if(BlueMates == 0){
+		Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "Team " + ChatColor.RED + "Red" + ChatColor.GREEN + " wins!");
+		MCMEPVP.resetGame();
+            }else if(RedMates == 0){
+		Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "Team " + ChatColor.BLUE + "Blue" + ChatColor.GREEN + " wins!");
+		MCMEPVP.resetGame();
+            }
+    }
     
 }

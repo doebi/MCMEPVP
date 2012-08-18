@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import co.mcme.pvp.gametypes.TDMGame;
 
@@ -19,11 +20,15 @@ public class MCMEPVP extends JavaPlugin {
     public static int GameStatus;
     public static GameType[] GameTypes = GameType.values();
     public static World PVPWorld;
+    public static HashMap<String, Vector> Spawns;
 
     @Override
     public void onEnable() {
         //registering Listener
         getServer().getPluginManager().registerEvents(new MCMEPVPListener(this), this);
+        Spawns.put("blue", (Vector) this.getConfig().get("spawns.spectator"));
+        Spawns.put("red", (Vector) this.getConfig().get("spawns.red"));
+        Spawns.put("spectator", (Vector) this.getConfig().get("spawns.spectator"));
         resetGame();
     }
 
@@ -115,18 +120,19 @@ public class MCMEPVP extends JavaPlugin {
         return false;
     }
 
-	static void resetGame() {
-		PlayerStatus = new HashMap<String, String>();
-    	//TODO
+	public static void resetGame() {
+            PlayerStatus = new HashMap<String, String>();
+            Spawns = new HashMap<String, Vector>();
+            //TODO
     }
     
-    void startGame(String gt){
-    	if(gt == "TDM"){
-            CurrentGame = new TDMGame(GameType.TDM);
-    	}else{
-    		
-    	}
-    }
+        void startGame(String gt){
+            if(gt == "TDM"){
+                CurrentGame = new TDMGame(GameType.TDM);
+            }else{
+
+            }
+        }
 
 	public static void setPlayerStatus(Player player, String status, ChatColor NameColor) {
 		player.getInventory().clear();
